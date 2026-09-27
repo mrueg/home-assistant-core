@@ -1,7 +1,6 @@
 """Helper methods to handle the time in Home Assistant."""
 
 import bisect
-from contextlib import suppress
 import datetime as dt
 from functools import lru_cache, partial
 import re
@@ -228,8 +227,10 @@ def parse_datetime(dt_str: str, *, raise_on_error: bool = False) -> dt.datetime 
     or raises ValueError if it's True.
     """
     # First try if the string can be parsed by the fast ciso8601 library
-    with suppress(ValueError, IndexError):
+    try:
         return ciso8601.parse_datetime(dt_str)
+    except ValueError, IndexError:
+        pass
 
     # ciso8601 failed to parse the string, fall back to regex
     if not (match := DATETIME_RE.match(dt_str)):
